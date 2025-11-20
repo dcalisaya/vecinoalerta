@@ -1,0 +1,9 @@
+AGENTS.MD
+ROADMAP.MD
+.DS_Store
+node_modules/
+.env
+build/
+.dart_tool/
+.idea/
+*.iml
