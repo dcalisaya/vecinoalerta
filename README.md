@@ -1,66 +1,109 @@
-# VECINO ALERTA
-**App de Respuesta Ciudadana Inteligente · 100 % gratuita · Código abierto · Lista para tu barrio**
+# Vecino Alerta 🚨
 
-> “Un solo botón rojo que activa la sirena del barrio y avisa a quien realmente tiene que actuar. Nada más. Nada menos.”
+**Vecino Alerta** es una plataforma de seguridad comunitaria de código abierto diseñada para empoderar a los barrios con tecnología de respuesta rápida ante emergencias.
 
-## ¿Qué resuelve exactamente?
-**Problema actual en el 95 % de los barrios organizados de Latinoamérica:**
-- Chat saturado de memes y “buen día”.
-- Cuando pasa algo grave nadie sabe si es real o broma.
-- La sirena comunitaria nunca suena porque nadie se anima a activarla.
-- El Comité no tiene datos duros para pedir más policía o luces al municipio.
+El sistema permite a los vecinos reportar incidentes, activar alarmas disuasivas y notificar a su comunidad en tiempo real a través de una aplicación móvil, mientras que un comité de seguridad gestiona las alertas desde un panel web centralizado.
 
-## Solución en 3 funciones ultra-simples
-*(Fase 1 – ya 100 % funcional)*
+## 🚀 Características
 
-### 🔴 BOTÓN DE PÁNICO (Rojo Gigante)
-Mantener 3 segundos → pantalla de confirmación → si confirma = **Emergencia Real**
-1. Suena la sirena física del barrio (60 segundos).
-2. Mensaje prioritario en el chat general.
-3. Notificación PUSH + ubicación exacta solo a guardianes de turno y vecinos en radio de 50 metros.
+- **Botón de Pánico (Botón Rojo):** Activación inmediata de sirenas y notificaciones push.
+- **Reportes Silenciosos:** Informar actividad sospechosa sin alertar al perpetrador.
+- **Geolocalización:** Ubicación precisa del incidente en tiempo real.
+- **Panel de Administración:** Dashboard para el Comité de Seguridad y SuperAdmin.
+- **Gestión de Barrios:** Soporte multi-barrio con roles y permisos (RBAC).
 
-### 🟢 ESTOY A SALVO / FALSA ALARMA (Verde Gigante)
-Cancela todo antes de que suene la sirena (evita el 80 % de las falsas alarmas). Nadie más se entera.
+## 🛠️ Stack Tecnológico
 
-### ⚪ REPORTE SILENCIOSO (Gris Discreto)
-Registrar merodeo, vehículo sospechoso o vandalismo que ya pasó (4 campos y enviar). Solo llega al Comité → se usa para mapa de calor.
+Este proyecto es un monorepo que contiene:
+
+- **Mobile App:** Flutter (Android/iOS)
+- **Web Panel:** React + Vite + Tailwind CSS
+- **Backend:** Firebase (Cloud Functions, Firestore, Auth, Messaging)
+
+## 📂 Estructura del Proyecto
+
+```bash
+vecino-alerta/
+├── vecino-alerta-app/      # Aplicación Móvil (Flutter)
+├── vecino-alerta-backend/  # Cloud Functions & Firestore Rules
+├── vecino-alerta-panel/    # Panel Web (React)
+└── vecino-alerta-docs/     # Documentación
+```
+
+## ⚙️ Configuración e Instalación
+
+### Prerrequisitos
+- Node.js (v18+)
+- Flutter SDK (v3.x+)
+- Firebase CLI (`npm install -g firebase-tools`)
+- Cuenta de Google/Firebase
+
+### 1. Configuración del Backend (Firebase)
+
+1.  Crea un proyecto en [Firebase Console](https://console.firebase.google.com/).
+2.  Habilita **Authentication** (Email/Password), **Firestore**, y **Functions**.
+3.  Actualiza a plan **Blaze** (requerido para Cloud Functions).
+4.  En tu terminal:
+    ```bash
+    firebase login
+    firebase use --add <TU_PROJECT_ID>
+    ```
+5.  Despliega el backend:
+    ```bash
+    cd vecino-alerta-backend/functions
+    npm install
+    npm run build
+    cd ../..
+    firebase deploy --only functions,firestore
+    ```
+
+### 2. Configuración del Panel Web
+
+1.  Navega al directorio del panel:
+    ```bash
+    cd vecino-alerta-panel
+    ```
+2.  Crea el archivo de entorno:
+    ```bash
+    cp .env.example .env.local
+    ```
+3.  Edita `.env.local` con tus credenciales de Firebase (obtenlas en Project Settings > General > Web App).
+4.  Instala y corre:
+    ```bash
+    npm install
+    npm run dev
+    ```
+
+### 3. Configuración de la App Móvil
+
+1.  Navega al directorio de la app:
+    ```bash
+    cd vecino-alerta-app
+    ```
+2.  Configura Firebase para Flutter:
+    ```bash
+    flutterfire configure
+    ```
+    *Sigue las instrucciones para seleccionar tu proyecto y plataformas.*
+3.  Corre la app:
+    ```bash
+    flutter run
+    ```
+
+## 🔐 Roles y Permisos
+
+El sistema utiliza **Custom Claims** de Firebase Auth.
+Para asignar el rol de `superadmin` o `comite` a un usuario, utiliza el script incluido:
+
+```bash
+cd vecino-alerta-backend/functions
+# Genera una Service Account Key en Firebase Console y guárdala como serviceAccountKey.json
+npx ts-node scripts/setRole.ts <EMAIL_USUARIO> <ROL> [BARRIO_ID]
+```
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Siéntete libre de usarlo y contribuir.
 
 ---
-*Eso es todo. Tres botones. Nada de chat interno, historias, fotos ni complicaciones.*
-
-## Beneficios comprobados
-*(Datos reales de barrios piloto – Argentina 2025)*
-- **73 % menos falsas alarmas** gracias a la doble confirmación.
-- **Tiempo de respuesta promedio: 38 segundos** desde que el vecino pulsa hasta que suena la sirena.
-- **100 % de los mayores de 65 años** aprendieron a usarla en menos de 4 minutos.
-- **Primer mes de uso:** el Comité ya identificó las 3 esquinas más calientes y logró que el municipio instale 5 luces LED nuevas.
-
-## Versión genérica: cualquier barrio la puede adoptar en 1 semana
-La app ya está preparada para multi-barrio desde el día 1:
-- Cada barrio tiene su propio “grupo” (se crea en 2 minutos desde el panel admin).
-- Logo, nombre del barrio, ubicación de la sirena y radio de geo-alerta configurable.
-- El mismo APK / App Store sirve para todos los barrios del país.
-- **Código abierto en GitHub** → cualquiera puede descargarlo y personalizarlo sin pedir permiso.
-
-## Requisitos mínimos
-Para que tu barrio la tenga funcionando en 15 días:
-1. Una sirena comunitaria con WiFi (Tuya, Shelly, Sonoff o similar).
-2. Alguien del barrio que organice 2 capacitaciones de 30 minutos (salón o Zoom).
-3. **Listo.** No se necesita servidor, no se paga hosting, no hay suscripción.
-
-## Frases para difusión
-- “¿Te gustaría que, la próxima vez que veas algo raro, con un solo botón suene la sirena y solo los vecinos cercanos salgan a ayudar… sin inundar el chat de mensajes?”
-- “En otros barrios ya bajó el delito un 40 % en 3 meses. ¿Cuándo arrancamos nosotros?”
-- “La app no espía, no pide contactos, no tiene publicidad y nunca va a tenerla. Es de los vecinos y para los vecinos.”
-
-## Descarga
-*(Próximamente - Diciembre 2025)*
-- **Android:** Play Store: “Vecino Alerta”
-- **iOS:** App Store: “VecinoAlerta”
-
----
-**¡En 15 días podemos ser el barrio más seguro y organizado de la ciudad!**
-¿Quién se suma a probarla primero con su familia?
-
-*Comité de Vigilancia + Vecinos Desarrolladores*
-*Noviembre 2025*
+*Desarrollado con ❤️ para comunidades más seguras.*

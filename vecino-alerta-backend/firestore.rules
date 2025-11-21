@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función auxiliar para verificar roles
+    function hasRole(role) {
+      return request.auth.token.role == role;
+    }
+
+    // 1. Barrios: Solo SuperAdmin crea, Comité lee su barrio
+    match /barrios/{barrioId} {
+      allow create: if hasRole('superadmin');
+      allow read: if hasRole('superadmin') || (request.auth.token.barrioId == barrioId);
+      allow update: if hasRole('superadmin') || (hasRole('comite') && request.auth.token.barrioId == barrioId);
+      
+      // 2. Sirenas: Solo Hardware Manager y SuperAdmin tocan configuración
+      match /sirena/{docId} {
+        allow read: if request.auth.token.barrioId == barrioId;
+        allow write: if (hasRole('hardware_manager') || hasRole('superadmin')) && request.auth.token.barrioId == barrioId;
+      }
+
+      // 3. Incidentes: Vecino crea, Comité gestiona
+      match /incidentes/{incidenteId} {
+        allow create: if request.auth.token.barrioId == barrioId; // Cualquier vecino del barrio
+        allow read: if request.auth.token.barrioId == barrioId;
+        allow update: if hasRole('comite') && request.auth.token.barrioId == barrioId; // Solo comité cierra/comenta
+      }
+      
+      // 4. Usuarios: Cada uno lee su perfil, Comité lee todos los de su barrio
+      match /usuarios/{uid} {
+        allow read: if request.auth.uid == uid || (hasRole('comite') && request.auth.token.barrioId == barrioId);
+        allow write: if request.auth.uid == uid; // Solo editar propios datos (foto/nombre)
+      }
+    }
+  }
+}
