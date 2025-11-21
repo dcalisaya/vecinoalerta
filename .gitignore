@@ -28,6 +28,8 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 vecino-alerta-backend/.secrets/
+vecino-alerta-docs/AGENTS.MD
+vecino-alerta-docs/ROADMAP.MD
 
 # IDE
 .idea/
