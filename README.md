@@ -118,17 +118,29 @@ npm install
 npm run dev
 ```
 
-#### 5. Configurar App Móvil (Flutter)
+#### 5. Configurar Firebase (Mobile App)
 
+#### Opción A: Usar FlutterFire CLI (Recomendado)
 ```bash
 cd vecino-alerta-app
-
-# Opción A: Usar FlutterFire CLI (Recomendado)
 flutterfire configure
-# Sigue las instrucciones para seleccionar tu proyecto
+```
 
-# Opción B: Manual
-# 1. Descarga google-services.json desde Firebase Console (Android App)
+#### Opción B: Manual
+```bash
+# 1. Copiar el archivo example
+cd vecino-alerta-app/lib
+cp firebase_options.example.dart firebase_options.dart
+
+# 2. Obtener credenciales de Firebase
+firebase apps:sdkconfig web --project vecinoalerta-2e0de
+firebase apps:sdkconfig android --project vecinoalerta-2e0de
+firebase apps:sdkconfig ios --project vecinoalerta-2e0de
+
+# 3. Reemplazar los placeholders YOUR_* en firebase_options.dart
+# con las credenciales reales obtenidas
+```
+ (Android App)
 #    y colócalo en: android/app/google-services.json
 # 2. Descarga GoogleService-Info.plist (iOS App)
 #    y colócalo en: ios/Runner/GoogleService-Info.plist

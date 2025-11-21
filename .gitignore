@@ -24,7 +24,7 @@ GoogleService-Info.plist
 .firebaserc
 
 # Flutter Firebase Options (real credentials)
-**/lib/firebase_options.dart
+
 
 # Mobile Platform Specific
 **/android/app/google-services.json

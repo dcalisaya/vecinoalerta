@@ -21,38 +21,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    appId: 'YOUR_WEB_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
-    measurementId: 'YOUR_MEASUREMENT_ID',
+    apiKey: 'AIzaSyB_8vQn1vK9uwm7nYU1Ra6887yO5mxlxW4',
+    appId: '1:200103006776:web:aee9ee15f4a76b5b004ccd',
+    messagingSenderId: '200103006776',
+    projectId: 'vecinoalerta-2e0de',
+    authDomain: 'vecinoalerta-2e0de.firebaseapp.com',
+    storageBucket: 'vecinoalerta-2e0de.firebasestorage.app',
+    measurementId: 'G-YCRQEQPM8L',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
+    apiKey: 'AIzaSyB_8vQn1vK9uwm7nYU1Ra6887yO5mxlxW4',
+    appId: '1:200103006776:android:52c2c5962c2c5962c2c596',
+    messagingSenderId: '200103006776',
+    projectId: 'vecinoalerta-2e0de',
+    storageBucket: 'vecinoalerta-2e0de.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: 'YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
-    iosBundleId: 'com.example.vecinoalerta',
+    apiKey: 'AIzaSyB_8vQn1vK9uwm7nYU1Ra6887yO5mxlxW4',
+    appId: '1:200103006776:ios:52c2c5962c2c5962c2c596',
+    messagingSenderId: '200103006776',
+    projectId: 'vecinoalerta-2e0de',
+    storageBucket: 'vecinoalerta-2e0de.firebasestorage.app',
+    iosBundleId: 'com.vecinoalerta.vecinoalerta',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'YOUR_MACOS_API_KEY',
-    appId: 'YOUR_MACOS_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
-    iosBundleId: 'com.example.vecinoalerta',
+    apiKey: 'AIzaSyB_8vQn1vK9uwm7nYU1Ra6887yO5mxlxW4',
+    appId: '1:200103006776:macos:52c2c5962c2c5962c2c596',
+    messagingSenderId: '200103006776',
+    projectId: 'vecinoalerta-2e0de',
+    storageBucket: 'vecinoalerta-2e0de.firebasestorage.app',
+    iosBundleId: 'com.livedev.vecinoalerta',
   );
 }
