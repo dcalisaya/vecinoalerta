@@ -17,6 +17,7 @@
 firebase-service-account.json
 serviceAccountKey.json
 **/serviceAccountKey.json
+**/lib/firebase_options.dart
 google-services.json
 GoogleService-Info.plist
 .secrets/
