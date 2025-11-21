@@ -19,6 +19,7 @@ serviceAccountKey.json
 **/serviceAccountKey.json
 google-services.json
 GoogleService-Info.plist
+.secrets/
 .firebase/
 .firebaserc
 
