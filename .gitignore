@@ -3,37 +3,61 @@
 .AppleDouble
 .LSOverride
 
+# Environment Variables
+*.env
+*.env.local
+*.env.production
+*.env.development
+.env
+.env.local
+.env.production
+.env.development
+
+# Firebase Credentials
+firebase-service-account.json
+serviceAccountKey.json
+**/serviceAccountKey.json
+google-services.json
+GoogleService-Info.plist
+.firebase/
+.firebaserc
+
+# Flutter Firebase Options (real credentials)
+**/lib/firebase_options.dart
+
+# Mobile Platform Specific
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+**/macos/Runner/GoogleService-Info.plist
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
 # Node
 node_modules/
 npm-debug.log
 yarn-error.log
+package-lock.json
 
-# Build
-dist/
-build/
+# Flutter/Dart
 .dart_tool/
-
-# Environment Variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-*.env
-!*.example
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.g.dart
 
 # Firebase
 .firebase/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
-vecino-alerta-backend/.secrets/
+ts/
 vecino-alerta-docs/AGENTS.MD
-vecino-alerta-docs/ROADMAP.MD
-
-# IDE
-.idea/
-.vscode/
 *.iml
 *.swp
 

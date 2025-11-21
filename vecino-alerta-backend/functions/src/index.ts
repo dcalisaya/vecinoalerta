@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import axios from "axios"; // Kept for future use
+import { SirenService } from "./services/SirenService";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -44,13 +44,8 @@ export const triggerEmergency = onCall(async (request) => {
         resolved: false,
     });
 
-    // 2. Activate Siren (Placeholder)
-    try {
-        console.log("Axios would be used here:", axios.defaults.timeout);
-        console.log("Siren activation signal sent (simulated)");
-    } catch (error) {
-        console.error("Failed to activate siren:", error);
-    }
+    // 2. Activate Siren
+    await SirenService.activate(barrioId);
 
     return { success: true, incidentId: incidentRef.id };
 });
@@ -73,7 +68,7 @@ export const cancelEmergency = onCall(async (request) => {
     });
 
     // 2. Deactivate Siren
-    console.log("Siren deactivation signal sent (simulated)");
+    await SirenService.deactivate(barrioId);
 
     return { success: true };
 });
@@ -120,7 +115,13 @@ export const getHeatmapData = onCall(async (request) => {
  */
 export const generateMonthlyReport = onSchedule("0 0 1 * *", async (event) => {
     console.log("Generating monthly reports for all barrios...");
-    // Logic here
+    // In a real implementation:
+    // 1. Fetch all barrios
+    // 2. For each barrio, fetch last month's incidents
+    // 3. Generate PDF using 'pdfkit'
+    // 4. Upload to Firebase Storage
+    // 5. Email link to Barrio Admin
+    console.log("Reports generated (simulated).");
 });
 
 /**

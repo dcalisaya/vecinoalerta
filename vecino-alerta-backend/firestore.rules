@@ -2,35 +2,106 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Función auxiliar para verificar roles
-    function hasRole(role) {
-      return request.auth.token.role == role;
+    // Helper functions for authentication and authorization
+    function isAuthenticated() {
+      return request.auth != null;
     }
-
-    // 1. Barrios: Solo SuperAdmin crea, Comité lee su barrio
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.get('superadmin', false) == true;
+    }
+    
+    function isComite() {
+      return isAuthenticated() && 
+             request.auth.token.get('comite', false) == true;
+    }
+    
+    function isComiteOfBarrio(barrioId) {
+      return isComite() && 
+             request.auth.token.get('barrioId', '') == barrioId;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Barrios Collection
     match /barrios/{barrioId} {
-      allow create: if hasRole('superadmin');
-      allow read: if hasRole('superadmin') || (request.auth.token.barrioId == barrioId);
-      allow update: if hasRole('superadmin') || (hasRole('comite') && request.auth.token.barrioId == barrioId);
+      // SuperAdmin can read/write all barrios
+      // Comite can only read their assigned barrio
+      // Regular users can read their barrio
+      allow read: if isAuthenticated() && (
+        isSuperAdmin() || 
+        isComiteOfBarrio(barrioId) ||
+        resource.data.usuarios[request.auth.uid] != null
+      );
       
-      // 2. Sirenas: Solo Hardware Manager y SuperAdmin tocan configuración
-      match /sirena/{docId} {
-        allow read: if request.auth.token.barrioId == barrioId;
-        allow write: if (hasRole('hardware_manager') || hasRole('superadmin')) && request.auth.token.barrioId == barrioId;
-      }
-
-      // 3. Incidentes: Vecino crea, Comité gestiona
+      // Only SuperAdmin can create/update/delete barrios
+      allow create, update, delete: if isSuperAdmin();
+      
+      // Validate barrio data structure
+      allow create, update: if request.resource.data.keys().hasAll(['nombre', 'createdAt']) &&
+                               request.resource.data.nombre is string &&
+                               request.resource.data.nombre.size() > 0;
+      
+      // Incidentes subcollection
       match /incidentes/{incidenteId} {
-        allow create: if request.auth.token.barrioId == barrioId; // Cualquier vecino del barrio
-        allow read: if request.auth.token.barrioId == barrioId;
-        allow update: if hasRole('comite') && request.auth.token.barrioId == barrioId; // Solo comité cierra/comenta
+        // Anyone authenticated in the barrio can read incidents
+        allow read: if isAuthenticated() && (
+          isSuperAdmin() ||
+          isComiteOfBarrio(barrioId) ||
+          get(/databases/$(database)/documents/barrios/$(barrioId)).data.usuarios[request.auth.uid] != null
+        );
+        
+        // Only authenticated users of the barrio can create incidents
+        allow create: if isAuthenticated() && 
+                         get(/databases/$(database)/documents/barrios/$(barrioId)).data.usuarios[request.auth.uid] != null &&
+                         request.resource.data.userId == request.auth.uid;
+        
+        // Only Comite or SuperAdmin can update/resolve incidents
+        allow update: if isSuperAdmin() || isComiteOfBarrio(barrioId);
+        
+        // Only SuperAdmin can delete incidents
+        allow delete: if isSuperAdmin();
+        
+        // Validate incident data structure
+        allow create: if request.resource.data.keys().hasAll(['type', 'timestamp', 'userId', 'location']) &&
+                         request.resource.data.type in ['EMERGENCY', 'SILENT_REPORT'] &&
+                         request.resource.data.timestamp is timestamp &&
+                         request.resource.data.location is map &&
+                         request.resource.data.location.keys().hasAll(['lat', 'lng']);
+        
+        // Validate update only allows specific fields
+        allow update: if request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['resolved', 'resolvedBy', 'resolvedAt']);
       }
+    }
+    
+    // Usuarios Collection
+    match /usuarios/{userId} {
+      // Users can read their own data
+      // Comite can read users in their barrio
+      // SuperAdmin can read all users
+      allow read: if isOwner(userId) || 
+                     isSuperAdmin() ||
+                     (isComite() && resource.data.barrioId == request.auth.token.barrioId);
       
-      // 4. Usuarios: Cada uno lee su perfil, Comité lee todos los de su barrio
-      match /usuarios/{uid} {
-        allow read: if request.auth.uid == uid || (hasRole('comite') && request.auth.token.barrioId == barrioId);
-        allow write: if request.auth.uid == uid; // Solo editar propios datos (foto/nombre)
-      }
+      // Users can create/update their own profile
+      allow create, update: if isOwner(userId);
+      
+      // Only SuperAdmin can delete users
+      allow delete: if isSuperAdmin();
+      
+      // Validate user data structure
+      allow create, update: if request.resource.data.keys().hasAll(['email', 'createdAt']) &&
+                               request.resource.data.email is string &&
+                               request.resource.data.email.matches('.*@.*');
+    }
+    
+    // Deny all other access by default
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

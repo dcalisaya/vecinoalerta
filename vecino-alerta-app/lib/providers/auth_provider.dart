@@ -8,6 +8,8 @@ class AuthProvider extends ChangeNotifier {
   User? get user => _user;
   bool get isAuthenticated => _user != null;
 
+  String? _verificationId;
+
   AuthProvider() {
     _auth.authStateChanges().listen((User? user) {
       _user = user;
@@ -15,14 +17,37 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
-  // Mock Login for development (since we don't have SMS setup yet)
-  Future<void> signInAnonymously() async {
-    try {
-      await _auth.signInAnonymously();
-    } catch (e) {
-      debugPrint("Error signing in anonymously: $e");
-      rethrow;
-    }
+  // Step 1: Send SMS
+  Future<void> verifyPhoneNumber(String phoneNumber, Function(String) codeSentCallback, Function(String) onError) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Auto-retrieval or instant verification
+        await _auth.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        onError(e.message ?? "Verification failed");
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        _verificationId = verificationId;
+        codeSentCallback(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        _verificationId = verificationId;
+      },
+    );
+  }
+
+  // Step 2: Verify OTP
+  Future<void> verifyOTP(String smsCode) async {
+    if (_verificationId == null) throw Exception("Verification ID is null");
+    
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: _verificationId!,
+      smsCode: smsCode,
+    );
+
+    await _auth.signInWithCredential(credential);
   }
 
   Future<void> signOut() async {

@@ -38,68 +38,140 @@ vecino-alerta/
 - Firebase CLI (`npm install -g firebase-tools`)
 - Cuenta de Google/Firebase
 
+### 🔐 Configuración de Credenciales
+
+Este proyecto NO incluye credenciales reales por seguridad. Debes generar las tuyas propias:
+
+#### 1. Crear Proyecto Firebase
+
+1. Ve a [Firebase Console](https://console.firebase.google.com/)
+2. Crea un nuevo proyecto
+3. Habilita los siguientes servicios:
+   - **Authentication** (Phone, Email/Password)
+   - **Firestore Database**
+   - **Cloud Functions**
+   - **Cloud Messaging (FCM)**
+   - **Hosting**
+4. Actualiza a plan **Blaze** (requerido para Cloud Functions)
+
+#### 2. Obtener Credenciales
+
+Ejecuta los siguientes comandos en tu terminal:
+
+```bash
+# Login a Firebase
+firebase login
+
+# Selecciona tu proyecto
+firebase use --add <TU_PROJECT_ID>
+
+# Obtén las credenciales para cada plataforma
+firebase apps:sdkconfig web > web-config.json
+firebase apps:sdkconfig android > android-config.json
+firebase apps:sdkconfig ios > ios-config.json
+```
+
+#### 3. Configurar Backend (Cloud Functions)
+
+```bash
+cd vecino-alerta-backend/functions
+
+# Copia el archivo de ejemplo
+cp .env.example .env
+
+# Edita .env con tus valores
+# FIREBASE_PROJECT_ID=tu-project-id
+# SIREN_API_URL=https://tu-api-de-sirenas.com
+# SIREN_API_KEY=tu-api-key
+
+# Genera Service Account Key desde Firebase Console:
+# Settings > Service Accounts > Generate New Private Key
+# Guárdala como serviceAccountKey.json
+
+# Instala dependencias
+npm install
+
+# Despliega
+cd ../..
+firebase deploy --only functions,firestore
+```
+
+#### 4. Configurar Panel Web
+
+```bash
+cd vecino-alerta-panel
+
+# Copia el archivo de ejemplo
+cp .env.example .env.local
+
+# Edita .env.local con los valores de web-config.json:
+# VITE_FIREBASE_API_KEY=tu-api-key
+# VITE_FIREBASE_AUTH_DOMAIN=tu-project.firebaseapp.com
+# VITE_FIREBASE_PROJECT_ID=tu-project-id
+# VITE_FIREBASE_STORAGE_BUCKET=tu-project.firebasestorage.app
+# VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
+# VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
+# VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# Instala y corre
+npm install
+npm run dev
+```
+
+#### 5. Configurar App Móvil (Flutter)
+
+```bash
+cd vecino-alerta-app
+
+# Opción A: Usar FlutterFire CLI (Recomendado)
+flutterfire configure
+# Sigue las instrucciones para seleccionar tu proyecto
+
+# Opción B: Manual
+# 1. Descarga google-services.json desde Firebase Console (Android App)
+#    y colócalo en: android/app/google-services.json
+# 2. Descarga GoogleService-Info.plist (iOS App)
+#    y colócalo en: ios/Runner/GoogleService-Info.plist
+# 3. Edita lib/firebase_options.dart con tus credenciales
+
+# Instala dependencias
+flutter pub get
+
+# Corre la app
+flutter run
+```
+
 ### 1. Configuración del Backend (Firebase)
 
-1.  Crea un proyecto en [Firebase Console](https://console.firebase.google.com/).
-2.  Habilita **Authentication** (Email/Password), **Firestore**, y **Functions**.
-3.  Actualiza a plan **Blaze** (requerido para Cloud Functions).
-4.  En tu terminal:
-    ```bash
-    firebase login
-    firebase use --add <TU_PROJECT_ID>
-    ```
-5.  Despliega el backend:
-    ```bash
-    cd vecino-alerta-backend/functions
-    npm install
-    npm run build
-    cd ../..
-    firebase deploy --only functions,firestore
-    ```
-
-### 2. Configuración del Panel Web
-
-1.  Navega al directorio del panel:
-    ```bash
-    cd vecino-alerta-panel
-    ```
-2.  Crea el archivo de entorno:
-    ```bash
-    cp .env.example .env.local
-    ```
-3.  Edita `.env.local` con tus credenciales de Firebase (obtenlas en Project Settings > General > Web App).
-4.  Instala y corre:
-    ```bash
-    npm install
-    npm run dev
-    ```
-
-### 3. Configuración de la App Móvil
-
-1.  Navega al directorio de la app:
-    ```bash
-    cd vecino-alerta-app
-    ```
-2.  Configura Firebase para Flutter:
-    ```bash
-    flutterfire configure
-    ```
-    *Sigue las instrucciones para seleccionar tu proyecto y plataformas.*
-3.  Corre la app:
-    ```bash
-    flutter run
-    ```
 
 ## 🔐 Roles y Permisos
 
 El sistema utiliza **Custom Claims** de Firebase Auth.
-Para asignar el rol de `superadmin` o `comite` a un usuario, utiliza el script incluido:
+Para asignar el rol de `superadmin` o `comite` a un usuario:
 
 ```bash
 cd vecino-alerta-backend/functions
-# Genera una Service Account Key en Firebase Console y guárdala como serviceAccountKey.json
+# Asegúrate de tener serviceAccountKey.json configurado
 npx ts-node scripts/setRole.ts <EMAIL_USUARIO> <ROL> [BARRIO_ID]
 ```
+
+Roles disponibles:
+- `superadmin`: Acceso total al sistema
+- `comite`: Gestión de un barrio específico
+
+## ⚠️ Archivos Sensibles (NO SUBIR A GIT)
+
+Los siguientes archivos contienen credenciales y están excluidos del repositorio:
+
+- `vecino-alerta-app/lib/firebase_options.dart`
+- `vecino-alerta-app/android/app/google-services.json`
+- `vecino-alerta-app/ios/Runner/GoogleService-Info.plist`
+- `vecino-alerta-backend/functions/serviceAccountKey.json`
+- `vecino-alerta-backend/functions/.env`
+- `vecino-alerta-panel/.env.local`
+
+**Usa siempre los archivos `.example` como referencia.**
+
 
 ## 📄 Licencia
 
